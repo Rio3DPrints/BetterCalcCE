@@ -1,0 +1,27 @@
+name: Compile TI-84 CE Program
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install CEdev Toolchain
+        run: |
+          wget https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-Linux.tar.gz
+          sudo mkdir -p /opt/CEdev
+          sudo tar -xzf CEdev-Linux.tar.gz -C /opt/CEdev --strip-components=1
+          echo "CEDEV=/opt/CEdev" >> $GITHUB_ENV
+          echo "/opt/CEdev/bin" >> $GITHUB_PATH
+
+      - name: Compile with Make
+        run: make
+
+      - name: Upload .8xp Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-program
+          path: bin/*.8xp
